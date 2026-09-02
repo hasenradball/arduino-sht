@@ -1,0 +1,45 @@
+name: Compile examples
+ 
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+ 
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - fqbn: arduino:avr:uno
+            platform: arduino:avr
+            sketch: examples/multiple-sht-sensors
+          - fqbn: arduino:avr:uno
+            platform: arduino:avr
+            sketch: examples/sht-autodetect
+          - fqbn: arduino:avr:uno
+            platform: arduino:avr
+            sketch: examples/sht3xanalog
+ 
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+ 
+      - name: Set up Arduino CLI
+        uses: arduino/setup-arduino-cli@v2
+ 
+      - name: Install core
+        run: |
+          arduino-cli core update-index
+          arduino-cli core install ${{ matrix.platform }}
+ 
+      - name: Compile ${{ matrix.sketch }}
+        run: |
+          arduino-cli compile \
+            --fqbn ${{ matrix.fqbn }} \
+            --library . \
+            --warnings all \
+            --build-property compiler.c.extra_flags="-Wall -Werror" \
+            --build-property compiler.cpp.extra_flags="-Wall -Werror" \
+            ${{ matrix.sketch }}
