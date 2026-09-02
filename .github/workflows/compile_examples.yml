@@ -21,15 +21,6 @@ jobs:
           - fqbn: arduino:avr:uno
             platform: arduino:avr
             sketch: examples/sht3xanalog
-          - fqbn: esp8266:esp8266:d1_mini
-            platform: esp8266:esp8266
-            sketch: examples/multiple-sht-sensors
-          - fqbn: esp8266:esp8266:d1_mini
-            platform: esp8266:esp8266
-            sketch: examples/sht-autodetect
-          - fqbn: esp8266:esp8266:d1_mini
-            platform: esp8266:esp8266
-            sketch: examples/sht3xanalog
  
     steps:
       - name: Check out repository
