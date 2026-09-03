@@ -176,8 +176,8 @@ public:
 private:
   void cleanup();
 
-  SHTSensorDriver *mSensor;
   SHTSensorType mSensorType;
+  SHTSensorDriver *mSensor;
   float mTemperature;
   float mHumidity;
 };
@@ -250,11 +250,9 @@ public:
   {
   }
 
-  virtual ~SHTI2cSensor()
-  {
-  }
+  ~SHTI2cSensor() = default;
 
-  virtual bool readSample();
+  bool readSample() override;
 
   uint8_t mI2cAddress;
   uint16_t mI2cCommand;

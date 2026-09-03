@@ -117,6 +117,8 @@ bool SHTI2cSensor::readSample()
 
   if (!readFromI2c(mWire, mI2cAddress, cmd, mCmd_Size, data,
                    EXPECTED_DATA_SIZE, mDuration)) {
+    mTemperature = NAN;
+    mHumidity = NAN;
     return false;
   }
 
@@ -191,6 +193,7 @@ public:
     if (!readFromI2c(mWire, mI2cAddress, cmd, mCmd_Size, data,
                      EXPECTED_DATA_SIZE / 2, mDuration)) {
       DEBUG_SHT("SHT2x readFromI2c(T) false\n");
+      mTemperature = NAN;
       return false;
     }
     
@@ -200,6 +203,7 @@ public:
     if (!readFromI2c(mWire, mI2cAddress, cmd, mCmd_Size, &data[3],
                      EXPECTED_DATA_SIZE / 2, mDuration)) {
       DEBUG_SHT("SHT2x readFromI2c(RH) false\n");
+      mHumidity = NAN;
       return false;
     }
 
@@ -208,6 +212,8 @@ public:
     // check CRC for both RH and T with a crc init value of 0
     if (crc8(&data[0], 2, 0) != data[2] || crc8(&data[3], 2, 0) != data[5]) {
       DEBUG_SHT("SHT2x crc8 false\n");
+      mTemperature = NAN;
+      mHumidity = NAN;
       return false;
     }
 
@@ -215,6 +221,8 @@ public:
     // bit 0: not used, bit 1: measurement type (0: temperature, 1 humidity)
     if (((data[1] & 0x02) != 0x00) || ((data[4] & 0x02) != 0x02)) {
       DEBUG_SHT("SHT2x status bits false\n");
+      mTemperature = NAN;
+      mHumidity = NAN;
       return false;
     }
 
@@ -256,7 +264,7 @@ public:
   {
   }
 
-  virtual bool setAccuracy(SHTSensor::SHTAccuracy newAccuracy)
+  bool setAccuracy(SHTSensor::SHTAccuracy newAccuracy) override
   {
     switch (newAccuracy) {
       case SHTSensor::SHT_ACCURACY_HIGH:
@@ -305,7 +313,7 @@ public:
   {
   }
 
-  virtual bool setAccuracy(SHTSensor::SHTAccuracy newAccuracy)
+  virtual bool setAccuracy(SHTSensor::SHTAccuracy newAccuracy) override
   {
     switch (newAccuracy) {
       case SHTSensor::SHT_ACCURACY_HIGH:
@@ -419,8 +427,11 @@ bool SHTSensor::init(TwoWire & wire)
 
 bool SHTSensor::readSample()
 {
-  if (!mSensor || !mSensor->readSample())
+  if (!mSensor || !mSensor->readSample()) {
+    mTemperature = NAN;
+    mHumidity = NAN;
     return false;
+  }
   mTemperature = mSensor->mTemperature;
   mHumidity = mSensor->mHumidity;
   return true;

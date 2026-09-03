@@ -46,6 +46,7 @@ void loop() {
 
 String getSensorName(SHTSensor::SHTSensorType sensorType) {
   switch (sensorType) {
+
     default:
       return "Unknown Sensortype!\n";
 
