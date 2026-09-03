@@ -1,4 +1,6 @@
+#include <Arduino.h>
 #include <Wire.h>
+
 #include "SHTSensor.h"
 
 // Note that all i2c devices sharing one bus must have distinct addresses. Thus
